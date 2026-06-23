@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLB - Online Banking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6f8459;
+            --primary-dark: #5a6b48;
+            --bg-body: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --error: #ef4444;
+            --success: #22c55e;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-body); color: var(--text-dark); overflow-x: hidden; }
+
+        /* --- AUTH VIEW --- */
+        #auth-view {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=1920');
+            background-size: cover;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .logo-header { text-align: center; margin-bottom: 30px; }
+        .logo-bars { display: flex; justify-content: center; gap: 4px; margin-bottom: 10px; }
+        .bar { width: 5px; height: 28px; background: var(--primary); }
+
+        .input-group { margin-bottom: 20px; position: relative; }
+        .input-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); }
+        .input-group input { 
+            width: 100%; padding: 12px 16px; border: 1px solid var(--border); 
+            border-radius: 8px; font-size: 15px; transition: border 0.2s;
+        }
+        .input-group input:focus { border-color: var(--primary); outline: none; }
+
+        .btn-primary { 
+            width: 100%; padding: 14px; background: var(--primary); color: white; 
+            border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;
+        }
+        .btn-primary:hover { background: var(--primary-dark); }
+
+        /* --- DASHBOARD --- */
+        #main-view { display: none; min-height: 100vh; }
+        
+        aside { 
+            width: 260px; background: #fff; border-right: 1px solid var(--border); 
+            position: fixed; height: 100vh; padding: 30px 20px; display: flex; flex-direction: column;
+        }
+        
+        .nav-item { 
+            padding: 12px 16px; margin-bottom: 4px; border-radius: 8px; 
+            cursor: pointer; color: var(--text-muted); font-weight: 500; transition: 0.2s;
+        }
+        .nav-item:hover { background: #f1f5f9; color: var(--primary); }
+        .nav-item.active { background: #f0f4ee; color: var(--primary); }
+
+        main { margin-left: 260px; flex: 1; padding: 40px; }
+        
+        /* Language Switcher */
+        .lang-btn {
+            background: #fff; border: 1px solid var(--border); padding: 8px 12px;
+            border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 6px; margin-bottom: 20px;
+        }
+
+        .card { background: #fff; border-radius: 12px; padding: 24px; border: 1px solid var(--border); margin-bottom: 24px; }
+        .card-header { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; letter-spacing: 0.05em; }
+        
+        .balance-hero { font-size: 32px; font-weight: 700; color: var(--text-dark); margin-bottom: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 12px; color: var(--text-muted); padding: 12px 0; border-bottom: 1px solid var(--border); }
+        td { padding: 16px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+
+        .hidden { display: none; }
+        
+        @media (max-width: 900px) {
+            aside { width: 80px; padding: 20px 10px; }
+            .nav-text, .logo-text { display: none; }
+            main { margin-left: 80px; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- AUTHENTICATION -->
+    <section id="auth-view">
+        <div class="auth-card">
+            <div class="logo-header">
+                <div class="logo-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+                <h2 data-i18n="auth_title">Welcome to LLB</h2>
+                <p data-i18n="auth_sub" style="color: var(--text-muted); font-size: 14px;">Secure E-Banking Access</p>
+            </div>
+            <form id="login-form">
+                <div class="input-group">
+                    <label data-i18n="label_user">Username</label>
+                    <input type="text" id="user-field" placeholder="Username" required>
+                </div>
+                <div class="input-group">
+                    <label data-i18n="label_pass">Password</label>
+                    <input type="password" id="pass-field" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary" id="login-btn" data-i18n="btn_login">Sign In</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="main-view">
+        <aside>
+            <div style="display: flex; gap: 4px; margin-bottom: 40px;">
+                <div class="bar" style="height: 20px;"></div><div class="bar" style="height: 20px;"></div><div class="bar" style="height: 20px;"></div>
+                <span class="logo-text" style="font-weight: 700; color: var(--primary);">LLB</span>
+            </div>
+            <div class="nav-item active" onclick="switchTab('overview', this)" data-i18n="nav_overview">Overview</div>
+            <div class="nav-item" onclick="switchTab('transfer', this)" data-i18n="nav_transfer">Transfer Funds</div>
+            <div class="nav-item" onclick="switchTab('data', this)" data-i18n="nav_data">Account Data</div>
+            <div style="margin-top: auto;" class="nav-item" onclick="logout()" data-i18n="nav_logout" style="color: var(--error);">Logout</div>
+        </aside>
+
+        <main>
+            <div style="display: flex; justify-content: flex-end;">
+                <button class="lang-btn" onclick="toggleLang()">
+                    <span id="flag-icon">🇩🇪</span> <span id="lang-label">Deutsch</span>
+                </button>
+            </div>
+
+            <div id="tab-overview">
+                <div class="card">
+                    <div class="card-header" data-i18n="card_assets">Total Assets</div>
+                    <div class="balance-hero">€ 2,500.00</div>
+                    <table>
+                        <thead><tr><th data-i18n="th_acc">Account</th><th style="text-align: right;" data-i18n="th_bal">Balance</th></tr></thead>
+                        <tbody><tr><td data-i18n="acc_name">Private Wealth (EUR)</td><td style="text-align: right; font-weight: 600;">€ 2,500.00</td></tr></tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" data-i18n="card_activity">Recent Activity</div>
+                    <table>
+                        <thead><tr><th data-i18n="th_date">Date</th><th data-i18n="th_desc">Description</th><th style="text-align: right;" data-i18n="th_amount">Amount</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td>11 Jun 2026</td>
+                                <td>Ria Money Transfer</td>
+                                <td style="text-align: right; color: var(--success); font-weight: 600;">+ € 2,500.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Transfer and Data tabs remain logically the same but with i18n tags -->
+            <div id="tab-transfer" class="hidden">
+                <div class="card" style="max-width: 600px;">
+                    <div class="card-header" data-i18n="nav_transfer">Transfer Funds</div>
+                    <form id="transfer-form">
+                        <div class="input-group">
+                            <label data-i18n="label_ben">Beneficiary Name</label>
+                            <input type="text" id="tx-name" required>
+                        </div>
+                        <div class="input-group">
+                            <label>IBAN</label>
+                            <input type="text" id="tx-iban" required>
+                        </div>
+                        <div class="input-group">
+                            <label data-i18n="th_amount">Amount (EUR)</label>
+                            <input type="number" id="tx-amount" step="0.01" required>
+                        </div>
+                        <button type="submit" class="btn-primary" data-i18n="btn_confirm">Confirm Transfer</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="tab-data" class="hidden">
+                <div class="card">
+                    <div class="card-header" data-i18n="nav_data">Account Data</div>
+                    <div style="display: grid; gap: 15px;">
+                        <div><label data-i18n="label_holder">Account Holder</label><p style="font-weight: 600;">Gerhard Stein</p></div>
+                        <div><label>IBAN</label><p style="font-weight: 600; font-family: monospace;">LI88 0880 0000 0991 0442 1</p></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <script>
+        let currentLang = 'en';
+        const i18n = {
+            en: {
+                auth_title: "Welcome to LLB", auth_sub: "Secure E-Banking Access", label_user: "Username", label_pass: "Password", btn_login: "Sign In",
+                nav_overview: "Overview", nav_transfer: "Transfer Funds", nav_data: "Account Data", nav_logout: "Logout",
+                card_assets: "Total Assets", th_acc: "Account", th_bal: "Balance", acc_name: "Private Wealth (EUR)",
+                card_activity: "Recent Activity", th_date: "Date", th_desc: "Description", th_amount: "Amount",
+                label_ben: "Beneficiary Name", btn_confirm: "Confirm Transfer", label_holder: "Account Holder",
+                lang_switch: "Deutsch", flag: "🇩🇪"
+            },
+            de: {
+                auth_title: "Willkommen bei der LLB", auth_sub: "Sicherer E-Banking Zugang", label_user: "Benutzername", label_pass: "Passwort", btn_login: "Anmelden",
+                nav_overview: "Übersicht", nav_transfer: "Überweisung", nav_data: "Kontodaten", nav_logout: "Abmelden",
+                card_assets: "Gesamtvermögen", th_acc: "Konto", th_bal: "Saldo", acc_name: "Privatvermögen (EUR)",
+                card_activity: "Letzte Aktivitäten", th_date: "Datum", th_desc: "Beschreibung", th_amount: "Betrag",
+                label_ben: "Name des Begünstigten", btn_confirm: "Überweisung bestätigen", label_holder: "Kontoinhaber",
+                lang_switch: "English", flag: "🇺🇸"
+            }
+        };
+
+        function toggleLang() {
+            currentLang = currentLang === 'en' ? 'de' : 'en';
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.innerText = i18n[currentLang][key];
+            });
+            document.getElementById('lang-label').innerText = i18n[currentLang].lang_switch;
+            document.getElementById('flag-icon').innerText = i18n[currentLang].flag;
+        }
+
+        // --- AUTH & NAV ---
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            document.getElementById('auth-view').style.display = 'none';
+            document.getElementById('main-view').style.display = 'flex';
+        });
+
+        function switchTab(tabId, el) {
+            document.querySelectorAll('main > div:not(:first-child)').forEach(div => div.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            el.classList.add('active');
+        }
+
+        function logout() { location.reload(); }
+    </script>
+</body>
+</html>
